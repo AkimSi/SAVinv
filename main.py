@@ -204,7 +204,7 @@ class App():
             # self.portfel_stocks_percent = float(data_list['% от портфеля'].values)
             self.stocks_amount = float(data_list['Количество бумаг(шт)'].values)
             self.average_price = float(data_list['Средняя цена покупки'].values)
-            self.balance_price = float(data_list['Балансовая стоимость'])
+            self.balance_price = float(data_list['Балансовая цена'])
 
             self.calculation_data_update()
     def back_to_main_control(self, control):
@@ -250,25 +250,22 @@ class App():
 
             self.stocks_fullname = str(calculation_line['Название'].values)
             self.current_price = float(calculation_line['Текущая цена'])
-            if self.current_price/2 < self.buying_price < self.current_price*2:
-                self.stocks_fullname = self.stocks_fullname[2:-2]
-                self.balance_price = float(calculation_line['Балансовая цена']) + self.buying_price * self.buying_stocks_amount
-                self.stocks_amount = float(calculation_line['Количество бумаг(шт)'])
-                self.average_price = self.balance_price/(self.stocks_amount + self.buying_stocks_amount)
-                self.stocks_amount = float(self.buying_stocks_amount) + self.stocks_amount
-                self.money_in_stock = self.stocks_amount * self.current_price
-                self.stocks_profit = (self.current_price - self.average_price)*self.stocks_amount
-                self.stocks_percent_profit = (self.current_price / self.average_price - 1) * 100
-                self.portfel_stocks_percent = round(self.money_in_stock * 10 / self.portfel_summ, 2)
-                self.portfel_summ += self.current_price*self.buying_stocks_amount - self.buying_stocks_amount*self.buying_price
-                self.free_portfel_summ = self.portfel_summ - self.money_in_stock
+            self.stocks_fullname = self.stocks_fullname[2:-2]
+            self.balance_price = float(calculation_line['Балансовая цена']) + self.buying_price * self.buying_stocks_amount
+            self.stocks_amount = float(calculation_line['Количество бумаг(шт)'])
+            self.average_price = self.balance_price/(self.stocks_amount + self.buying_stocks_amount)
+            self.stocks_amount = float(self.buying_stocks_amount) + self.stocks_amount
+            self.money_in_stock = self.stocks_amount * self.current_price
+            self.stocks_profit = (self.current_price - self.average_price)*self.stocks_amount
+            self.stocks_percent_profit = (self.current_price / self.average_price - 1) * 100
+            self.portfel_stocks_percent = round(self.money_in_stock * 10 / self.portfel_summ, 2)
+            self.portfel_summ += self.current_price*self.buying_stocks_amount - self.buying_stocks_amount*self.buying_price
+            self.free_portfel_summ = self.portfel_summ - self.money_in_stock
 
-                self.write_system_data()
+            self.write_system_data()
 
-                self.writting_stocks_byuing_data_to_file()
-            else:
-                self.clear_current_data()
-                self.main_control()
+            self.writting_stocks_byuing_data_to_file()
+
 
 
         else:
@@ -285,25 +282,22 @@ class App():
                 self.main_control()
             else:
                 self.current_price = float(search_line['Текущая цена'])
-                if self.current_price / 2 < self.buying_price < self.current_price * 2:
-                    self.stocks_fullname = self.stocks_fullname[2:-2]
-                    self.money_in_stock = round(self.current_price * self.buying_stocks_amount, 2)
-                    self.average_price = self.buying_price
-                    self.stocks_amount = self.buying_stocks_amount
-                    self.stocks_profit = round(self.money_in_stock - self.average_price * self.buying_stocks_amount, 2)
-                    self.stocks_percent_profit = (self.current_price / self.average_price - 1) * 100
-                    self.portfel_stocks_percent = round(self.money_in_stock * 10 / self.portfel_summ, 2)
-                    self.balance_price = round(self.buying_price * self.buying_stocks_amount, 2)
-                    self.portfel_summ += self.stocks_profit
-                    self.free_portfel_summ = self.portfel_summ - self.money_in_stock
+                self.stocks_fullname = self.stocks_fullname[2:-2]
+                self.money_in_stock = round(self.current_price * self.buying_stocks_amount, 2)
+                self.average_price = self.buying_price
+                self.stocks_amount = self.buying_stocks_amount
+                self.stocks_profit = round(self.money_in_stock - self.average_price * self.buying_stocks_amount, 2)
+                self.stocks_percent_profit = (self.current_price / self.average_price - 1) * 100
+                self.portfel_stocks_percent = round(self.money_in_stock * 10 / self.portfel_summ, 2)
+                self.balance_price = round(self.buying_price * self.buying_stocks_amount, 2)
+                self.portfel_summ += self.stocks_profit
+                self.free_portfel_summ = self.portfel_summ - self.money_in_stock
 
-                    self.write_system_data()
-                    self.writting_stocks_byuing_data_to_file()
+                self.write_system_data()
+                self.writting_stocks_byuing_data_to_file()
 
-                    self.clear_current_data()
-                else:
-                    self.clear_current_data()
-                    self.main_control()
+                self.clear_current_data()
+
 
     def clear_current_data(self):
         self.current_price = None
@@ -337,27 +331,27 @@ class App():
 
             self.stocks_fullname = str(calculation_line['Название'].values)
             self.current_price = float(calculation_line['Текущая цена'])
-            if self.current_price / 2 < self.buying_price < self.current_price * 2:
-                self.stocks_fullname = self.stocks_fullname[2:-2]
-                self.stocks_amount = float(calculation_line['Количество бумаг(шт)'])
-                self.average_price = round(float(calculation_line['Средняя цена покупки']), 2)
-                self.balance_price = float(calculation_line['Балансовая цена'])
-                self.balance_price = round(self.balance_price - self.balance_price / self.stocks_amount * self.buying_stocks_amount, 2)
-                self.stocks_amount = self.stocks_amount - self.buying_stocks_amount
-                self.money_in_stock = float(calculation_line['Средств в бумаге']) - self.buying_price * self.buying_stocks_amount
-                self.stocks_profit = (self.buying_price - self.average_price) * self.buying_stocks_amount + (self.current_price - self.average_price)*self.stocks_amount
-                self.stocks_percent_profit = (self.current_price / self.average_price - 1) * 100
-                self.portfel_stocks_percent = round(self.money_in_stock * 10 / self.portfel_summ, 2)
-                self.portfel_summ -= (self.buying_price - self.average_price) * self.buying_stocks_amount
-                self.free_portfel_summ += self.buying_stocks_amount * self.buying_price
-                self.write_system_data()
-                if self.stocks_amount == 0:
-                    pass
-                else:
-                    self.writting_stocks_byuing_data_to_file()
+
+            self.stocks_fullname = self.stocks_fullname[2:-2]
+            self.stocks_amount = float(calculation_line['Количество бумаг(шт)'])
+            self.average_price = round(float(calculation_line['Средняя цена покупки']), 2)
+            self.balance_price = float(calculation_line['Балансовая цена'])
+            self.balance_price = round(
+            self.balance_price - self.balance_price / self.stocks_amount * self.buying_stocks_amount, 2)
+            self.stocks_amount = self.stocks_amount - self.buying_stocks_amount
+            self.money_in_stock = float(
+                calculation_line['Средств в бумаге']) - self.buying_price * self.buying_stocks_amount
+            self.stocks_profit = (self.buying_price - self.average_price) * self.buying_stocks_amount + (
+            self.current_price - self.average_price) * self.stocks_amount
+            self.stocks_percent_profit = (self.current_price / self.average_price - 1) * 100
+            self.portfel_stocks_percent = round(self.money_in_stock * 10 / self.portfel_summ, 2)
+            self.portfel_summ -= (self.buying_price - self.average_price) * self.buying_stocks_amount
+            self.free_portfel_summ += self.buying_stocks_amount * self.buying_price
+            self.write_system_data()
+            if self.stocks_amount == 0:
+                pass
             else:
-                self.clear_current_data()
-                self.main_control()
+                self.writting_stocks_byuing_data_to_file()
 
 
         else:
@@ -373,25 +367,23 @@ class App():
                 self.main_control()
             else:
                 self.current_price = float(search_line['Текущая цена'])
-                if self.current_price / 2 < self.buying_price < self.current_price * 2:
-                    self.stocks_fullname = self.stocks_fullname[2:-2]
+                self.stocks_fullname = self.stocks_fullname[2:-2]
 
-                    self.money_in_stock = round(self.current_price * self.buying_stocks_amount, 2)
-                    self.average_price = self.buying_price
-                    self.stocks_amount = self.buying_stocks_amount
-                    self.stocks_profit = round(self.money_in_stock + self.average_price * self.buying_stocks_amount, 2)
-                    self.stocks_percent_profit = (self.current_price / self.average_price - 1) * 100
-                    self.portfel_stocks_percent = round(self.money_in_stock * 10 / self.portfel_summ, 2)
-                    self.balance_price = round(self.buying_price * self.buying_stocks_amount, 2)
-                    self.free_portfel_summ = self.portfel_summ - self.buying_price * self.buying_stocks_amount
+                self.money_in_stock = round(self.current_price * self.buying_stocks_amount, 2)
+                self.average_price = self.buying_price
+                self.stocks_amount = self.buying_stocks_amount
+                self.stocks_profit = round(self.money_in_stock + self.average_price * self.buying_stocks_amount, 2)
+                self.stocks_percent_profit = (self.current_price / self.average_price - 1) * 100
+                self.portfel_stocks_percent = round(self.money_in_stock * 10 / self.portfel_summ, 2)
+                self.balance_price = round(self.buying_price * self.buying_stocks_amount, 2)
+                self.free_portfel_summ = self.portfel_summ - self.buying_price * self.buying_stocks_amount
 
-                    self.write_system_data()
-                    self.writting_stocks_byuing_data_to_file()
+                self.write_system_data()
+                self.writting_stocks_byuing_data_to_file()
 
-                    self.clear_current_data()
-                else:
-                    self.clear_current_data()
-                    self.main_control()
+
+                self.clear_current_data()
+
 
     #вычисление данных при обновлении портфеля
     def calculation_data_update(self):
@@ -447,9 +439,10 @@ class App():
     def loading_data(self):
         read_file_portfel_data = pd.read_csv('portfel.csv', delimiter=';', encoding='Windows-1251',
                                            names=['Название', 'Тикер', 'Текущая цена',
-                                                  'Средств в бумаге', 'Профит/лосс',
-                                                  '% от портфеля', 'Количество бумаг(шт)',
-                                                  'Средняя цена покупки', 'Балансовая стоимость'])
+                                                        'Средств в бумаге', 'Профит/лосс',
+                                                        'Профит/лосс (%)', '% от портфеля',
+                                                        'Количество бумаг(шт)', 'Средняя цена покупки',
+                                                        'Балансовая цена'])
         self.existing_stoks = read_file_portfel_data.Тикер
         self.existing_stoks = list(self.existing_stoks)
 

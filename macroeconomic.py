@@ -140,63 +140,87 @@ headers = {
 
 
 ##########################inventories
-# sales = cons_total_busn_inv / cons_invent_to_sales_ind
-# inv_list = read_file_macro_data[['Склады']]
-# inv_list = inv_list.tail(12)
-# aver_div = inv_list.Склады.median()
-# last_measure = float(inv_list.tail(1).values)
-#условие фазы восхода
-# if cons_total_busn_inv < aver_div:
-#     inventories_indicate = "SUPER_UP"
-# #условие фазы развития и заката
-# elif cons_total_busn_inv > aver_div and cons_total_busn_inv > aver_div:
-#     inventories_indicate = "UP"
-# #условие фазы рецессии
-# elif cons_total_busn_inv < last_measure:
-#     inventories_indicate = "DOWN"
-# else:
-#     print("Something wrong")
-#
-#
-# inv_list = read_file_macro_data[['Продажи']]
-# inv_list = inv_list.tail(12)
-# aver_div = inv_list.Продажи.median()
-# last_measure = float(inv_list.tail(1).values)
-# #условие для восхода
-# if sales < aver_div and cons_total_busn_inv > last_measure:
-#     sales_indicate = "SUPER_UP"
-# #условие для роста
-# elif sales > aver_div and cons_total_busn_inv > last_measure:
-#     sales_indicate = "UP"
-# elif sales == last_measure:
-#     sales_indicate = "UP"
-# #условие для заката
-# elif sales < last_measure and sales > aver_div:
-#     sales_indicate = "DOWN"
-# #условие для рецессии
-# elif sales < last_measure and sales < aver_div:
-#     sales_indicate = "SUPER_DOWN"
-# elif sales == aver_div:
-#     sales_indicate = "NEUTRAL"
-# else:
-#     print("Something wrong")
-#
-# if sales_indicate == 'UP' and inventories_indicate == 'UP':
-#     inventories_and_sales = 'Развитие'
-# elif sales_indicate == 'DOWN' and inventories_indicate == 'SUPER_UP':
-#     inventories_and_sales = 'Закат'
-# elif sales_indicate == 'SUPER_DOWN' and inventories_indicate == 'DOWN':
-#     inventories_and_sales = 'Рецессия'
-# elif sales_indicate == 'SUPER_UP' and inventories_indicate == 'SUPER_UP':
-#     inventories_and_sales = 'Восход'
-# elif sales_indicate == 'UP' and inventories_indicate == 'SUPER_UP':
-#     inventories_and_sales = 'Восход'
-#
-# print(inventories_and_sales)
-# write_row = ['01.07.2021', cons_invent_to_sales_ind, cons_total_busn_inv, sales]
-# with open('test.csv', 'a', newline='') as file:
-#     writer = csv.writer(file, delimiter=';')
-#     writer.writerow(write_row)
+adding_macro_data = pd.read_csv('macro_data\\adding.csv', delimiter=';', encoding='Windows-1251',
+                                              names=['Дата', 'Запасы', 'Запасы/Продажи', 'Продажи'])
+
+
+list_inventories = list(adding_macro_data[['Запасы']].values)
+list_inv_to_sales = list(adding_macro_data[['Запасы/Продажи']].values)
+list_sales = list(adding_macro_data[['Продажи']].values)
+data_list = list(adding_macro_data[['Дата']].values)
+ind = 0
+recess_count = 0
+for inv in list_inventories:
+    data = str(data_list[ind])
+    inv = float(inv)
+    inv_to_sales = float(list_inv_to_sales[ind])
+    sales = float(list_sales[ind])
+    ind += 1
+    read_file_macro_data = pd.read_csv('macro_data\\invetories_indicate.csv',
+                                       delimiter=';', encoding='Windows-1251',
+                                       names=['Дата', 'Запасы', 'Запасы/Продажи', 'Продажи'])
+    inv_list = read_file_macro_data[['Запасы']]
+    inv_list = inv_list.tail(24)
+    aver_div = inv_list.Запасы.median()
+    last_measure = float(inv_list.tail(1).values)
+    #условие фазы рецессии
+    if inv < last_measure and inv > aver_div and recess_count > 0:
+        inventories_indicate = "RECESSION"
+    elif inv < last_measure and inv > aver_div:
+        recess_count += 1
+        inventories_indicate = inventories_indicate
+    #условие фазы развития и заката
+    elif inv > aver_div:
+        recess_count = 0
+        inventories_indicate = "RISE"
+    # условие фазы восхода
+    elif inv < aver_div:
+        recess_count = 0
+        inventories_indicate = "E_RISE"
+    else:
+        recess_count = 0
+        print("Something wrong")
+
+    inv_list = read_file_macro_data[['Продажи']]
+    inv_list = inv_list.tail(12)
+    aver_div = inv_list.Продажи.median()
+    last_measure = float(inv_list.tail(1).values)
+    #условие для восхода
+    if sales < aver_div and sales > last_measure:
+        sales_indicate = "E_RISE"
+    #условие для роста
+    elif sales > aver_div:
+        sales_indicate = "RISE"
+    elif sales == last_measure:
+        sales_indicate = "RISE"
+    #условие для заката
+    elif sales < last_measure and sales > aver_div:
+        sales_indicate = "L_RISE"
+
+    #условие для рецессии
+    elif sales < last_measure and sales < aver_div:
+        sales_indicate = "RECESSION"
+    elif sales == aver_div:
+        sales_indicate = "L_RISE"
+    else:
+        print("Something wrong")
+    print(sales_indicate)
+    print(data)
+
+    if sales_indicate == 'RISE' and inventories_indicate == 'RISE':
+        inventories_and_sales = 'Развитие'
+    elif sales_indicate == 'L_RISE' and inventories_indicate == 'L_RISE':
+        inventories_and_sales = 'Закат'
+    elif sales_indicate == 'RECESSION' and inventories_indicate == 'RECESSION':
+        inventories_and_sales = 'Рецессия'
+    elif sales_indicate == 'E_RISE' and inventories_indicate == 'E_RISE':
+        inventories_and_sales = 'Восход'
+
+
+    write_row = [data, inv, inv_to_sales, sales]
+    with open('macro_data\\invetories_indicate.csv', 'a', newline='') as file:
+        writer = csv.writer(file, delimiter=';')
+        writer.writerow(write_row)
 ##################################
 ###############Баланс ФРС
 # adding_macro_data = pd.read_csv('test_adding.csv', delimiter=';', encoding='Windows-1251',
@@ -343,60 +367,60 @@ headers = {
 #         writer = csv.writer(file, delimiter=';')
 #         writer.writerow(write_row)
 ################Кредит
-adding_macro_data = pd.read_csv('test_adding.csv', delimiter=';', encoding='Windows-1251',
-                                             names=['Дата', 'Закредитованность'])
-adding_asset = adding_macro_data[['Закредитованность']].values
-adding_data = adding_macro_data[['Дата']].values
-adding_data = list(adding_data)
-
-count = 1
-for credit in adding_asset:
-    credit = float(credit)
-    #
-    read_file_macro_data = pd.read_csv('test.csv', delimiter=';', encoding='Windows-1251',
-                                       names=['Дата', 'Закредитованность', 'Склады',
-                                              'Продажи', 'Профит/лосс',
-                                              '% от портфеля', 'Количество бумаг(шт)',
-                                              'Средняя цена покупки'])
-
-    assets_list = read_file_macro_data[['Закредитованность']]
-    inv_list = assets_list.tail(3)
-    aver_div = inv_list.Закредитованность.median()
-    last_measure = float(assets_list.tail(1).values)
-    rand_div = aver_div * 0.006
-
-    # условие для фазы заката
-    if credit > (aver_div - rand_div / 2) and credit < (aver_div + rand_div / 2):
-        assets_ind = 'NEUTRAL'
-    #условие для фазы рота
-    elif credit > (aver_div + rand_div):
-        assets_ind = "UP"
-    # условие для фазы вохода
-    elif credit > last_measure and credit < aver_div + rand_div:
-        assets_ind = 'SUPER_UP'
-    # условие для фазы рецессии
-    elif credit < aver_div and credit < last_measure:
-        assets_ind = 'DOWN'
-    else:
-        print("something wrong")
-
-    if assets_ind == 'DOWN':
-        credit_ind = "Рецессия"
-    elif assets_ind == 'NEUTRAL':
-        credit_ind = "Закат"
-    elif assets_ind == 'UP':
-        credit_ind = "Рост"
-    elif assets_ind == 'SUPER_UP':
-        credit_ind = "Восход"
-    else:
-        print('Something Wrong')
-    print(credit_ind)
-    print(adding_data[count])
-    write_row = [adding_data[count], credit]
-    count += 1
-    with open('test.csv', 'a', newline='') as file:
-        writer = csv.writer(file, delimiter=';')
-        writer.writerow(write_row)
+# adding_macro_data = pd.read_csv('test_adding.csv', delimiter=';', encoding='Windows-1251',
+#                                              names=['Дата', 'Закредитованность'])
+# adding_asset = adding_macro_data[['Закредитованность']].values
+# adding_data = adding_macro_data[['Дата']].values
+# adding_data = list(adding_data)
+#
+# count = 1
+# for credit in adding_asset:
+#     credit = float(credit)
+#     #
+#     read_file_macro_data = pd.read_csv('test.csv', delimiter=';', encoding='Windows-1251',
+#                                        names=['Дата', 'Закредитованность', 'Склады',
+#                                               'Продажи', 'Профит/лосс',
+#                                               '% от портфеля', 'Количество бумаг(шт)',
+#                                               'Средняя цена покупки'])
+#
+#     assets_list = read_file_macro_data[['Закредитованность']]
+#     inv_list = assets_list.tail(3)
+#     aver_div = inv_list.Закредитованность.median()
+#     last_measure = float(assets_list.tail(1).values)
+#     rand_div = aver_div * 0.006
+#
+#     # условие для фазы заката
+#     if credit > (aver_div - rand_div / 2) and credit < (aver_div + rand_div / 2):
+#         assets_ind = 'NEUTRAL'
+#     #условие для фазы рота
+#     elif credit > (aver_div + rand_div):
+#         assets_ind = "UP"
+#     # условие для фазы вохода
+#     elif credit > last_measure and credit < aver_div + rand_div:
+#         assets_ind = 'SUPER_UP'
+#     # условие для фазы рецессии
+#     elif credit < aver_div and credit < last_measure:
+#         assets_ind = 'DOWN'
+#     else:
+#         print("something wrong")
+#
+#     if assets_ind == 'DOWN':
+#         credit_ind = "Рецессия"
+#     elif assets_ind == 'NEUTRAL':
+#         credit_ind = "Закат"
+#     elif assets_ind == 'UP':
+#         credit_ind = "Рост"
+#     elif assets_ind == 'SUPER_UP':
+#         credit_ind = "Восход"
+#     else:
+#         print('Something Wrong')
+#     print(credit_ind)
+#     print(adding_data[count])
+#     write_row = [adding_data[count], credit]
+#     count += 1
+#     with open('test.csv', 'a', newline='') as file:
+#         writer = csv.writer(file, delimiter=';')
+#         writer.writerow(write_row)
 ##############Запись данных в файл######################
 # writing_list = []
 # with open('portfel.csv', 'w', newline='') as file:
