@@ -140,131 +140,141 @@ headers = {
 
 
 ##########################inventories
-adding_macro_data = pd.read_csv('macro_data\\adding.csv', delimiter=';', encoding='Windows-1251',
-                                              names=['Дата', 'Запасы', 'Запасы/Продажи', 'Продажи'])
+# adding_macro_data = pd.read_csv('macro_data\\adding.csv', delimiter=';', encoding='Windows-1251',
+#                                               names=['Дата', 'Запасы', 'Запасы/Продажи', 'Продажи'])
+#
+#
+# list_inventories = list(adding_macro_data[['Запасы']].values)
+# list_inv_to_sales = list(adding_macro_data[['Запасы/Продажи']].values)
+# list_sales = list(adding_macro_data[['Продажи']].values)
+# data_list = list(adding_macro_data[['Дата']].values)
+# ind = 0
+# recess_count = 0
+# for inv in list_inventories:
+#     data = str(data_list[ind])
+#     inv = float(inv)
+#     inv_to_sales = float(list_inv_to_sales[ind])
+#     sales = float(list_sales[ind])
+#     ind += 1
+#     read_file_macro_data = pd.read_csv('macro_data\\invetories_indicate.csv',
+#                                        delimiter=';', encoding='Windows-1251',
+#                                        names=['Дата', 'Запасы', 'Запасы/Продажи', 'Продажи'])
+#     inv_list = read_file_macro_data[['Запасы']]
+#     inv_list = inv_list.tail(24)
+#     aver_div = inv_list.Запасы.median()
+#     last_measure = float(inv_list.tail(1).values)
+#     #условие фазы рецессии
+#     if inv < last_measure and inv > aver_div and recess_count > 0:
+#         inventories_indicate = "RECESSION"
+#     elif inv < last_measure and inv > aver_div:
+#         recess_count += 1
+#         inventories_indicate = inventories_indicate
+#     #условие фазы развития и заката
+#     elif inv > aver_div:
+#         recess_count = 0
+#         inventories_indicate = "RISE"
+#     # условие фазы восхода
+#     elif inv < aver_div:
+#         recess_count = 0
+#         inventories_indicate = "E_RISE"
+#     else:
+#         recess_count = 0
+#         print("Something wrong")
+#
+#     inv_list = read_file_macro_data[['Продажи']]
+#     inv_list = inv_list.tail(18)
+#     aver_div = inv_list.Продажи.median()
+#     last_measure = float(inv_list.tail(1).values)
+#     #условие для восхода
+#     if sales < aver_div and sales > last_measure:
+#         sales_indicate = "E_RISE"
+#         # условие для заката
+#     elif sales < last_measure and sales > aver_div:
+#         sales_indicate = "L_RISE"
+#     elif sales < last_measure + last_measure * 0.02  and sales > aver_div:
+#         sales_indicate = "L_RISE"
+#     #условие для роста
+#     elif sales > aver_div:
+#         sales_indicate = "RISE"
+#     elif sales == last_measure:
+#         sales_indicate = "RISE"
+#     #условие для рецессии
+#     elif sales < last_measure and sales < aver_div:
+#         sales_indicate = "RECESSION"
+#     elif sales == aver_div:
+#         sales_indicate = "L_RISE"
+#     else:
+#         print("Something wrong")
+#
+#     if sales_indicate == 'RISE' and inventories_indicate == 'E_RISE':
+#         inventories_and_sales = 'Развитие'
+#     elif sales_indicate == 'RISE' and inventories_indicate == 'RISE':
+#         inventories_and_sales = 'Развитие'
+#     elif sales_indicate == 'L_RISE' and inventories_indicate == 'E_RISE':
+#         inventories_and_sales = 'Развитие'
+#     elif sales_indicate == 'L_RISE' and inventories_indicate == 'RISE':
+#         inventories_and_sales = 'Закат'
+#     elif sales_indicate == 'RECESSION' and inventories_indicate == 'RECESSION':
+#         inventories_and_sales = 'Рецессия'
+#     elif sales_indicate == 'RECESSION' and inventories_indicate == 'E_RISE':
+#         inventories_and_sales = 'Рецессия'
+#     elif sales_indicate == 'E_RISE' and inventories_indicate == 'E_RISE':
+#         inventories_and_sales = 'Восход'
+#     elif sales_indicate == 'E_RISE' and inventories_indicate == 'RISE':
+#         inventories_and_sales = 'Восход'
+#     else:
+#         print(sales_indicate)
+#         print(inventories_indicate)
+#         print(data)
 
 
-list_inventories = list(adding_macro_data[['Запасы']].values)
-list_inv_to_sales = list(adding_macro_data[['Запасы/Продажи']].values)
-list_sales = list(adding_macro_data[['Продажи']].values)
-data_list = list(adding_macro_data[['Дата']].values)
-ind = 0
-recess_count = 0
-for inv in list_inventories:
-    data = str(data_list[ind])
-    inv = float(inv)
-    inv_to_sales = float(list_inv_to_sales[ind])
-    sales = float(list_sales[ind])
-    ind += 1
-    read_file_macro_data = pd.read_csv('macro_data\\invetories_indicate.csv',
-                                       delimiter=';', encoding='Windows-1251',
-                                       names=['Дата', 'Запасы', 'Запасы/Продажи', 'Продажи'])
-    inv_list = read_file_macro_data[['Запасы']]
-    inv_list = inv_list.tail(24)
-    aver_div = inv_list.Запасы.median()
-    last_measure = float(inv_list.tail(1).values)
-    #условие фазы рецессии
-    if inv < last_measure and inv > aver_div and recess_count > 0:
-        inventories_indicate = "RECESSION"
-    elif inv < last_measure and inv > aver_div:
-        recess_count += 1
-        inventories_indicate = inventories_indicate
-    #условие фазы развития и заката
-    elif inv > aver_div:
-        recess_count = 0
-        inventories_indicate = "RISE"
-    # условие фазы восхода
-    elif inv < aver_div:
-        recess_count = 0
-        inventories_indicate = "E_RISE"
-    else:
-        recess_count = 0
-        print("Something wrong")
-
-    inv_list = read_file_macro_data[['Продажи']]
-    inv_list = inv_list.tail(12)
-    aver_div = inv_list.Продажи.median()
-    last_measure = float(inv_list.tail(1).values)
-    #условие для восхода
-    if sales < aver_div and sales > last_measure:
-        sales_indicate = "E_RISE"
-    #условие для роста
-    elif sales > aver_div:
-        sales_indicate = "RISE"
-    elif sales == last_measure:
-        sales_indicate = "RISE"
-    #условие для заката
-    elif sales < last_measure and sales > aver_div:
-        sales_indicate = "L_RISE"
-
-    #условие для рецессии
-    elif sales < last_measure and sales < aver_div:
-        sales_indicate = "RECESSION"
-    elif sales == aver_div:
-        sales_indicate = "L_RISE"
-    else:
-        print("Something wrong")
-    print(sales_indicate)
-    print(data)
-
-    if sales_indicate == 'RISE' and inventories_indicate == 'RISE':
-        inventories_and_sales = 'Развитие'
-    elif sales_indicate == 'L_RISE' and inventories_indicate == 'L_RISE':
-        inventories_and_sales = 'Закат'
-    elif sales_indicate == 'RECESSION' and inventories_indicate == 'RECESSION':
-        inventories_and_sales = 'Рецессия'
-    elif sales_indicate == 'E_RISE' and inventories_indicate == 'E_RISE':
-        inventories_and_sales = 'Восход'
-
-
-    write_row = [data, inv, inv_to_sales, sales]
-    with open('macro_data\\invetories_indicate.csv', 'a', newline='') as file:
-        writer = csv.writer(file, delimiter=';')
-        writer.writerow(write_row)
+    # write_row = [data, inv, inv_to_sales, sales]
+    # with open('macro_data\\invetories_indicate.csv', 'a', newline='') as file:
+    #     writer = csv.writer(file, delimiter=';')
+    #     writer.writerow(write_row)
 ##################################
 ###############Баланс ФРС
-# adding_macro_data = pd.read_csv('test_adding.csv', delimiter=';', encoding='Windows-1251',
-#                                              names=['Дата', 'Активы_ФРС'])
-# adding_asset = adding_macro_data[['Активы_ФРС']].values
-# read_file_macro_data = pd.read_csv('test.csv', delimiter=';', encoding='Windows-1251',
-#                                    names=['Дата', 'Активы_ФРС', 'Склады',
-#                                           'Продажи', 'Профит/лосс',
-#                                           '% от портфеля', 'Количество бумаг(шт)',
-#                                           'Средняя цена покупки'])
-#
-# assets_list = read_file_macro_data[['Активы_ФРС']]
-# inv_list = assets_list.tail(24)
-# aver_div = assets_list.Активы_ФРС.median()
-# last_measure = float(assets_list.tail(1).values)
-# rand_div = aver_div * 0.005
-# for total_assets in adding_asset:
-#     total_assets = int(total_assets)
-#     # условие для фазы рецессии
-#     if total_assets > aver_div:
-#         assets_ind = 'STIMULATE'
-#     # условие для фазы развития
-#     elif (total_assets - rand_div) < aver_div < (total_assets + rand_div):
-#         assets_ind = 'NEUTRAL'
-#     #условие для фазы заката
-#     elif total_assets < aver_div:
-#         assets_ind = "HARD"
-#     else:
-#         print("something wrong")
-#
-#     if assets_ind == 'STIMULATE':
-#         regulate_ind = "Рецессия-Воход"
-#     elif assets_ind == 'HARD':
-#         regulate_ind = "Закат"
-#     elif assets_ind == 'NEUTRAL':
-#         regulate_ind = "Рост"
-#     else:
-#         print('Something Wrong')
-#     print(regulate_ind)
-#     print(total_assets)
-#     write_row = ['дата', total_assets]
-#     with open('test.csv', 'a', newline='') as file:
-#         writer = csv.writer(file, delimiter=';')
-#         writer.writerow(write_row)
+adding_macro_data = pd.read_csv('macro_data\\adding.csv', delimiter=';', encoding='Windows-1251',
+                                              names=['Дата', 'Баланс'])
+
+
+list_assets = list(adding_macro_data[['Баланс']].values)
+data_list = list(adding_macro_data[['Дата']].values)
+read_file_macro_data = pd.read_csv('test.csv', delimiter=';', encoding='Windows-1251',
+                                   names=['Дата', 'Активы_ФРС', 'Склады',
+                                          'Продажи', 'Профит/лосс',
+                                          '% от портфеля', 'Количество бумаг(шт)',
+                                          'Средняя цена покупки'])
+for assets in list_assets:
+    assets_list = read_file_macro_data[['Активы_ФРС']]
+    inv_list = assets_list.tail(24)
+    aver_div = inv_list.Активы_ФРС.median()
+    last_measure = float(assets_list.tail(1).values)
+    rand_div = aver_div * 0.015
+
+    assets = int(assets)
+    # условие для фазы рецессии
+    if assets > (aver_div + rand_div) and assets > last_measure:
+        assets_ind = 'STIMULATE'
+    # условие для фазы развития
+    elif (assets - rand_div) < aver_div < (assets + rand_div):
+        assets_ind = 'RISE'
+    # условие для фазы восхода
+    elif assets > aver_div:
+        assets_ind = "L_RISE"
+    # условие для фазы заката
+    elif assets < aver_div - rand_div:
+        assets_ind = "L_RISE"
+    else:
+        print("something wrong")
+    print(assets_ind)
+    print(assets)
+    print(data)
+    write_row = [data, assets]
+    with open('macro_data\\total_assets_ind.csv', 'a', newline='') as file:
+        writer = csv.writer(file, delimiter=';')
+        writer.writerow(write_row)
+
 ############Процентная ставка
 # adding_macro_data = pd.read_csv('test_adding.csv', delimiter=';', encoding='Windows-1251',
 #                                              names=['Дата', 'ставка_ФРС'])
