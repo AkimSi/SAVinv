@@ -240,31 +240,34 @@ adding_macro_data = pd.read_csv('macro_data\\adding.csv', delimiter=';', encodin
 
 list_assets = list(adding_macro_data[['Баланс']].values)
 data_list = list(adding_macro_data[['Дата']].values)
-read_file_macro_data = pd.read_csv('test.csv', delimiter=';', encoding='Windows-1251',
-                                   names=['Дата', 'Активы_ФРС', 'Склады',
-                                          'Продажи', 'Профит/лосс',
-                                          '% от портфеля', 'Количество бумаг(шт)',
-                                          'Средняя цена покупки'])
+count = 0
+stimul_count = 0
 for assets in list_assets:
+    read_file_macro_data = pd.read_csv('macro_data\\total_assets_ind.csv', delimiter=';', encoding='Windows-1251',
+                                       names=['Дата', 'Активы_ФРС'])
+    data = str(data_list[count])
+    count += 1
     assets_list = read_file_macro_data[['Активы_ФРС']]
-    inv_list = assets_list.tail(24)
-    aver_div = inv_list.Активы_ФРС.median()
-    last_measure = float(assets_list.tail(1).values)
-    rand_div = aver_div * 0.015
-
+    inv_list = assets_list.tail(20)
+    aver_value = inv_list.Активы_ФРС.median()
+    aver_div = inv_list.Активы_ФРС.std()
+    last_measure = int(assets_list.tail(1).values)
     assets = int(assets)
     # условие для фазы рецессии
-    if assets > (aver_div + rand_div) and assets > last_measure:
+    if assets > (aver_value + aver_div) and assets > last_measure and stimul_count < 4:
         assets_ind = 'STIMULATE'
-    # условие для фазы развития
-    elif (assets - rand_div) < aver_div < (assets + rand_div):
+        stimul_count += 1
+        # условие для фазы развития
+    elif (aver_value - aver_div) < assets and assets < (aver_value + aver_div):
         assets_ind = 'RISE'
-    # условие для фазы восхода
-    elif assets > aver_div:
-        assets_ind = "L_RISE"
+        stimul_count = 0
     # условие для фазы заката
-    elif assets < aver_div - rand_div:
+    elif assets < (aver_value - aver_div):
         assets_ind = "L_RISE"
+        stimul_count = 0
+    # условие для фазы восхода
+    elif assets > (aver_value + aver_div):
+        assets_ind = "E_RISE"
     else:
         print("something wrong")
     print(assets_ind)
