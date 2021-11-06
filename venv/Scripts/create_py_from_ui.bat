@@ -1,0 +1,1 @@
+pyuic5.exe -x D:\my_programm\SAVinv\interface.ui -o D:\my_programm\SAVinv\interface.py

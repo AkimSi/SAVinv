@@ -1,0 +1,14 @@
+lxml
+requests
+bs4
+csv
+re
+pandas
+time
+schedule
+sys
+threading
+telebot
+auth_data
+macroeconomic
+threading
