@@ -11,7 +11,7 @@ from threading import Thread
 class Macro_economic():
     def __init__(self):
         self.pmi = None
-        schedule.every().day.at('22:00').do(self.loading_inernet_data)
+        schedule.every().day.at('23:16').do(self.loading_inernet_data)
         self.recess_count = 0
         self.stimul_count_assets = 0
 ##########################################Блок управления
@@ -23,6 +23,8 @@ class Macro_economic():
         communicate.start()
         update.join()
         communicate.join()
+        # self.inicialization_economic_data()
+        # self.loading_inernet_data()
 
     def update_control(self):
         schedule.run_pending()
@@ -376,28 +378,42 @@ class Macro_economic():
             print("Something wrong")
 
         if sales_indicate == 'RISE' and inventories_indicate == 'E_RISE':
-            self.inventories_and_sales = 'Развитие'
+            self.inventories_and_sales = 'Рост продаж выше среднего значения. ' \
+                                         'Запасы ниже среднего. Фаза развития.'
 
         elif sales_indicate == 'RISE' and inventories_indicate == 'RISE':
-            self.inventories_and_sales = 'Развитие'
+            self.inventories_and_sales = 'Рост продаж выше среднего значения.' \
+                                         ' Запасы на складах выше среднего значения.' \
+                                         'Фаза развития'
 
         elif sales_indicate == 'L_RISE' and inventories_indicate == 'E_RISE':
-            self.inventories_and_sales = 'Развитие'
+            self.inventories_and_sales = 'Продажи упали ниже последнего значения.' \
+                                         'Запасы ниже среднего.' \
+                                         'Фаза заката'
 
         elif sales_indicate == 'L_RISE' and inventories_indicate == 'RISE':
-            self.inventories_and_sales = 'Закат'
+            self.inventories_and_sales = 'Продажи упали ниже последнего значения.' \
+                                         'Запасы на складах выше среднего значения.' \
+                                         'Фаза заката'
 
         elif sales_indicate == 'RECESSION' and inventories_indicate == 'RECESSION':
-            self.inventories_and_sales = 'Рецессия'
+            self.inventories_and_sales = 'Продажи,как и запасы на складах падают.' \
+                                         'Фаза рецессии'
 
         elif sales_indicate == 'RECESSION' and inventories_indicate == 'E_RISE':
-            self.inventories_and_sales = 'Рецессия'
+            self.inventories_and_sales = 'Продажи падают ниже средниъ значений.' \
+                                         'Запасы на складах ниже среднего значения.' \
+                                         'Фаза рецессии.'
 
         elif sales_indicate == 'E_RISE' and inventories_indicate == 'E_RISE':
-            self.inventories_and_sales = 'Восход'
+            self.inventories_and_sales = 'Продажи улучшаются, но ниде среднего значения.' \
+                                         'Запасы на складах ниже среднего значения.' \
+                                         'Фаза восхода'
 
         elif sales_indicate == 'E_RISE' and inventories_indicate == 'RISE':
-            self.inventories_and_sales = 'Восход'
+            self.inventories_and_sales = 'Продажи улучшаются, но ниде среднего значения.' \
+                                         'Запасы на складах выше среднего значения.' \
+                                         'Фаза восхода.'
 
         else:
             print(sales_indicate)
@@ -433,21 +449,21 @@ class Macro_economic():
         # assets = int(assets)
         # условие для фазы рецессии
         if self.assets > (aver_value + aver_div) and self.assets > last_measure and self.stimul_count_assets < 4:
-            self.assets_ind = 'Сильное стимулирование (Фаза рецессии)'
+            self.assets_ind = 'Сильное стимулирование. Фаза рецессии'
             self.stimul_count_assets += 1
 
             # условие для фазы развития
         elif (aver_value - aver_div) < self.assets and self.assets < (aver_value + aver_div):
-            self.assets_ind = 'Устойчивый рост активов. Значительная поддрежка (Фаза рецессии)'
+            self.assets_ind = 'Устойчивый рост активов. Значительная поддрежка. Фаза рецессии.'
             self.stimul_count_assets = 0
         # условие для фазы заката
         elif self.assets < (aver_value - aver_div):
-            self.assets_ind = "Соркащение активов. Сворачивание стимулирования (Фаза заката)"
+            self.assets_ind = "Соркащение активов. Сворачивание стимулирования. Фаза заката."
             self.stimul_count_assets = 0
 
         # условие для фазы восхода
         elif self.assets > (aver_value + aver_div):
-            self.assets_ind = "Продолжение значительного стимулирования (Фаза восхода)"
+            self.assets_ind = "Продолжение значительного стимулирования. Фаза восхода."
         else:
             print("Что-то пошло не так")
 
@@ -482,14 +498,19 @@ class Macro_economic():
     #
         # условие для фазы развития
         if self.inter_rate < aver_value and self.inter_rate == last_measure:
-            self.interest_rate_ind = 'E_RASE'
+            self.interest_rate_ind = 'Низкая процентная ставка. Стимулирование экономики.' \
+                                     'Фаза восхода.'
         elif self.inter_rate < aver_value:
-            self.interest_rate_ind = 'STIMULATE'
+            self.interest_rate_ind = 'Низкая процентная ставка. Стимулирование экономики.' \
+                                     'Фаза рецессии'
         #условие для фазы заката
         elif self.inter_rate > aver_value:
-            self.interest_rate_ind = "L_RASE"
+            self.interest_rate_ind = "Процентная ставка выше среднего значения. " \
+                                     "Ужесточение монетарной политики." \
+                                     "Фаза заката."
         elif self.inter_rate == last_measure or self.inter_rate > last_measure:
-            self.interest_rate_ind = "RASE"
+            self.interest_rate_ind = "Процентная ставка равнв реднему значению." \
+                                     "Фаза роста."
 
         else:
             print("something wrong")
@@ -520,11 +541,13 @@ class Macro_economic():
         # last_measure = float(infl_rate_list.tail(1).values)
         # infl_rate = float(self.infl_rate)
         if self.infl_rate < aver_value:
-            self.inflation_rate_ind = 'LOWER'
+            self.inflation_rate_ind = 'Инфляция на низком уровне.' \
+                                      'Ужесточение монетарной политики, не прогнозируется.'
         elif self.infl_rate > aver_value:
-            self.inflation_rate_ind = 'HIGHER'
+            self.inflation_rate_ind = 'Инфляция на высоком уровне. ' \
+                                      'Высокая вероятность ужесточения монетарной политики.'
         elif self.infl_rate == aver_value:
-            self.inflation_rate_ind = "MEDIUM"
+            self.inflation_rate_ind = "Инфляция на среднем уровне."
         else:
             print("something wrong")
         write_row = [self.date_inflation, self.infl_rate]
@@ -555,15 +578,15 @@ class Macro_economic():
 
         #условие для фазы восхода
         if self.corp_profits > (aver_value + aver_div) and self.corp_profits > last_measure:
-            self.corp_profits_ind = 'RISE'
+            self.corp_profits_ind = 'Корпоративная прибыль растет. Фаза роста.'
             # условие для фазы роста
         elif (aver_value - aver_div) < self.corp_profits and self.corp_profits < (aver_value + aver_div):
-            self.corp_profits_ind = 'CONSOLIDATION'
+            self.corp_profits_ind = 'Корпоративна яприбыль на средних значениях. Фаза заката.'
         # условие для фазы заката
         elif self.corp_profits < (aver_value - aver_div):
-            self.corp_profits_ind = "DOWN"
+            self.corp_profits_ind = "Корпоративная прибыли на низких значениях. Фаза заката."
         elif self.corp_profits > last_measure:
-            self.corp_profits_ind = 'RISE_FROM_DOWN'
+            self.corp_profits_ind = 'Корпоративная прибыль начинает расти. Фаза восхода.'
         else:
             print("something wrong")
             print(self.corp_profits)
@@ -597,10 +620,10 @@ class Macro_economic():
         #условие для роста
 
         if self.credit > aver_value:
-            self.credit_ind = 'RISE'
+            self.credit_ind = 'Кредитование выше среднего значения. '
         # условие для фазы снижения
         elif aver_value > self.credit:
-            self.credit_ind = 'DOWN'
+            self.credit_ind = 'Кредитование ниже среднего значения.'
         else:
             print("something wrong")
         write_row = [self.date_credit, self.credit]
@@ -631,13 +654,13 @@ class Macro_economic():
         self.unemployments = float(self.unemployments)
 
         if self.unemployments > (aver_value + aver_div*0.5):
-            self.unempl_ind = 'HIGH'
+            self.unempl_ind = 'Высокий уровень безработицы.'
 
         elif (aver_value - aver_div*0.5) < self.unemployments and self.unemployments < (aver_value + aver_div*0.5):
-            self.unempl_ind = 'MIDDLE'
+            self.unempl_ind = 'Уровень безработицы на средних уровнях.'
 
         elif self.unemployments < (aver_value - aver_div*0.5):
-            self.unempl_ind = "LOW"
+            self.unempl_ind = "Низкий уровень безработицы."
 
         else:
             print("something wrong")
@@ -669,16 +692,16 @@ class Macro_economic():
         self.ec_ind = float(self.ec_ind)
 
         if self.ec_ind > 0 and self.ec_ind > aver_value - aver_div:
-            self.economic_ind = 'RISE'
+            self.economic_ind = 'Уровень экономического индекса. До средних значний. Фаза роста.'
 
         elif self.ec_ind < 0 and self.ec_ind > aver_value + aver_div:
-            self.economic_ind = 'E_RISE'
+            self.economic_ind = 'Уровень экономического индекса выше средних значений. Фаза восхода.'
 
         elif self.ec_ind < 0 and self.ec_ind < last_measure:
-            self.economic_ind = 'RECESSION'
+            self.economic_ind = 'Уровень экономичекого индекса снижается. Фаза заката.'
 
         elif self.ec_ind > 0 and self.ec_ind < aver_value - aver_div:
-            self.economic_ind = "L_RISE"
+            self.economic_ind = "Уровень экономического индекса падает ниже среднего уровня. Фаза рецессии."
 
         else:
             print("something wrong")
